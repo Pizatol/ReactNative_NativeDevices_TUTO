@@ -1,4 +1,4 @@
-import { REACT_APP_PRIVATE_GOOGLE_API_KEY } from "../env";
+import { REACT_APP_PRIVATE_GOOGLE_API_KEY } from "./env";
 
 
 

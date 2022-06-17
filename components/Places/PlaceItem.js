@@ -3,8 +3,11 @@ import React from "react";
 import { Colors } from "../../constants/colors";
 
 export default function PlaceItem({ place, onSelect }) {
+
+
+
     return (
-        <Pressable style={({pressed}) => [styles.item, pressed && styles.pressed]} onPress={onSelect}>
+        <Pressable style={({pressed}) => [styles.item, pressed && styles.pressed]} onPress={onSelect.bind(this, place.id)}>
             <Image style={styles.image} source={{ uri: place.imageUri }} />
             <View style={styles.info}>
                 <Text style={styles.title}>{place.title}</Text>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, Alert, Image } from "react-native";
 import {
     getCurrentPositionAsync,
@@ -10,15 +10,45 @@ import OutlinedButton from "../UI/OutlinedButton";
 
 import { Colors } from "../../constants/colors";
 import { getMapPreview } from "../../util/location";
-import { useNavigation } from "@react-navigation/native";
+import {
+    useNavigation,
+    useRoute,
+    useIsFocused,
+} from "@react-navigation/native";
+import { getAddress } from "../../util/location";
 
-export default function LocationPicker() {
+export default function LocationPicker({ onLocationPick }) {
     const [pickedLocation, setPickedLocation] = useState();
+
+    const route = useRoute();
+    const navigation = useNavigation();
+    const isFocused = useIsFocused();
 
     const [locationPermissionInformation, requestPermission] =
         useForegroundPermissions();
 
-   const navigation =  useNavigation();
+    useEffect(() => {
+        if (isFocused && route.params) {
+            const mapPickedLocation = {
+                lat: route.params.pickedLat,
+                lng: route.params.pickedLng,
+            };
+            setPickedLocation(mapPickedLocation);
+        }
+    }, [route, isFocused]);
+
+    useEffect(() => {
+        const handleLocation = async () => {
+            if (pickedLocation) {
+                const address = await getAddress(
+                    pickedLocation.lat,
+                    pickedLocation.lng
+                );
+                onLocationPick({...pickedLocation, address : address});
+            }
+        };
+        handleLocation();
+    }, [pickedLocation, onLocationPick]);
 
     const verifyPermissions = async () => {
         if (
@@ -54,7 +84,7 @@ export default function LocationPicker() {
     };
 
     const pickOnMapHandler = () => {
-        navigation.navigate('Map')
+        navigation.navigate("Map");
     };
 
     let locationPreview = <Text>No location picked yet!</Text>;
